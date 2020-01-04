@@ -1,8 +1,3 @@
-provider "aws" {
-  profile = "${var.profile}"
-  region = "${var.region}"
-}
-
 # Create VPC
 resource "aws_vpc" "vpc" {
   cidr_block = "${var.cidr_block}"
@@ -48,7 +43,7 @@ resource "aws_subnet" "pvt_sub" {
 resource "aws_subnet" "data_sub" {
   count = "${length(var.azs)}"
   vpc_id = "${aws_vpc.vpc.id}"
-  cidr_block = "${cidrsubnet(var.cidr_block, var.data_subnet_mask - local.vpc_mask, count.index + (length(var.azs * 2)))}"
+  cidr_block = "${cidrsubnet(var.cidr_block, var.data_subnet_mask - local.vpc_mask, count.index + (length(var.azs) * 2))}"
   availability_zone = "${element(var.azs, count.index)}"
 
   tags = {
