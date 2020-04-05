@@ -34,6 +34,7 @@ This terraform module will deploy the following services:
 | Parameter            | Type   | Description                                                      |
 |----------------------|--------|------------------------------------------------------------------|
 | vpc_id               | string | ID of VPC created                                                |
+| vpc_cidr               | string | CIDR block of VPC created                                                |
 | public_subnet_id     | list   | ID of public subnet(s) created                                   |
 | public_subnet_cidrs  | list   | CIDR block of public subnet(s) created                           |
 | private_subnet_id    | list   | ID of private subnet(s) created                                  |
