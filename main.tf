@@ -358,21 +358,21 @@ resource "aws_security_group" "pvt_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.pub_sg.id]
+    security_groups = aws_security_group.pub_sg.*.id
   }
 
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.pub_sg.id]
+    security_groups = aws_security_group.pub_sg.*.id
   }
 
   ingress {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = [aws_security_group.pub_sg.id]
+    security_groups = aws_security_group.pub_sg.*.id
   }
 
   egress {
