@@ -276,6 +276,7 @@ resource "aws_network_acl" "data_nacl" {
 
 # Create security group for internal communication
 resource "aws_security_group" "int_sg" {
+  count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-internal-sg"
   description = "Security group allowing communication internally within the VPC"
@@ -297,6 +298,7 @@ resource "aws_security_group" "int_sg" {
 
 # Create security group for accepting only SSH connection
 resource "aws_security_group" "ssh_sg" {
+  count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-ssh-sg"
   description = "Security group allowing only SSH connections"
@@ -318,6 +320,7 @@ resource "aws_security_group" "ssh_sg" {
 
 # Create security group for public facing web servers or load balancer
 resource "aws_security_group" "pub_sg" {
+  count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-pub-web-sg"
   description = "Security group allowing 80 and 443 from outer world"
@@ -346,6 +349,7 @@ resource "aws_security_group" "pub_sg" {
 
 # Create security group for internal web/app servers
 resource "aws_security_group" "pvt_sg" {
+  count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-pvt-web-sg"
   description = "Security group allowing 22, 80 and 443 internally for instances"
