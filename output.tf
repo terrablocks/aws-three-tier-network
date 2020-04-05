@@ -18,6 +18,14 @@ output "private_subnet_cidrs" {
   value = aws_subnet.pvt_sub.*.cidr_block
 }
 
+output "data_subnet_ids" {
+  value = aws_subnet.data_sub.*.id
+}
+
+output "data_subnet_cidrs" {
+  value = aws_subnet.data_sub.*.cidr_block
+}
+
 output "nat_public_ip" {
   value = aws_nat_gateway.nat_gw.public_ip
 }
