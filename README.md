@@ -28,6 +28,7 @@ This terraform module will deploy the following services:
 | flow_logs_destination | string  | Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs | cloud-watch-logs             | N        |
 | private_zone          | boolean | Whether to create private hosted zone for VPC                             | false                        | N        |
 | private_zone_domain   | string  | Domain name to be used for private hosted zone                            | server.internal.com          | N        |
+| create_sgs   | boolean  | Whether to create default security groups (public, private, internal and ssh)                            | true          | N        |
 
 ## Outputs
 | Parameter            | Type   | Description                                                      |
