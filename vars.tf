@@ -24,11 +24,23 @@ variable "data_subnet_mask" {
   default = "24"
 }
 
+variable "create_pvt_nat" {
+  default = true
+}
+
+variable "create_data_nat" {
+  default = true
+}
+
+variable "create_flow_logs" {
+  default = true
+}
+
 variable "flow_logs_destination" {
   default = "cloud-watch-logs"
 }
 
-variable "private_zone" {
+variable "create_private_zone" {
   default = false
 }
 

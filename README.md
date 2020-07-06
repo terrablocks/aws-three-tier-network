@@ -30,8 +30,11 @@ MIT Licence. See [Licence](LICENCE) for full details.
 | pub_subnet_mask       | string  | Subnet mask to use for public subnet                                      | 24                           | N        |
 | pvt_subnet_mask       | string  | Subnet mask to use for private subnet                                     | 24                           | N        |
 | data_subnet_mask      | string  | Subnet mask to use for data subnet                                        | 24                           | N        |
+| create_pvt_nat            | boolean | Whether to create NAT gateway for private subnet                                     | true                           | N        |
+| create_data_nat            | boolean | Whether to create NAT gateway for data subnet                                     | true                           | N        |
+| create_flow_logs      | boolean | Whether to enable flow logs for VPC                                     | true                           | N        |
 | flow_logs_destination | string  | Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs | cloud-watch-logs             | N        |
-| private_zone          | boolean | Whether to create private hosted zone for VPC                             | false                        | N        |
+| create_private_zone          | boolean | Whether to create private hosted zone for VPC                             | false                        | N        |
 | private_zone_domain   | string  | Domain name to be used for private hosted zone                            | server.internal.com          | N        |
 | create_sgs   | boolean  | Whether to create default security groups (public, private, internal and ssh)                            | true          | N        |
 
