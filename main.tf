@@ -28,12 +28,6 @@ resource "aws_subnet" "pub_sub" {
     Name = "${var.network_name}-pub-sub-${element(var.azs, count.index)}"
     Tier = "public"
   }, var.tags)
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
 }
 
 # Create private subnet
@@ -51,12 +45,6 @@ resource "aws_subnet" "pvt_sub" {
     Name = "${var.network_name}-pvt-sub-${element(var.azs, count.index)}"
     Tier = "private"
   }, var.tags)
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
 }
 
 # Create data subnet
@@ -74,12 +62,6 @@ resource "aws_subnet" "data_sub" {
     Name = "${var.network_name}-data-sub-${element(var.azs, count.index)}"
     Tier = "private"
   }, var.tags)
-
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
 }
 
 # Create internet gateway
