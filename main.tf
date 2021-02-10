@@ -493,7 +493,6 @@ resource "aws_iam_role_policy" "flow_logs_policy" {
   ]
 }
 EOF
-
 }
 
 resource "random_id" "id" {
