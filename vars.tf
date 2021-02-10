@@ -53,6 +53,6 @@ variable "create_sgs" {
 }
 
 variable "tags" {
-  type = map
+  type    = map(any)
   default = {}
 }
