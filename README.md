@@ -60,7 +60,7 @@ module "vpc" {
 | public_subnet_cidrs  | list   | CIDR block of public subnet(s) created                           |
 | private_subnet_ids    | list   | ID of private subnet(s) created                                  |
 | private_subnet_cidrs | list   | CIDR block of private subnet(s) created                          |
-| data_subnet_id       | list   | ID of data subnet(s) created                                  |
+| data_subnet_ids       | list   | ID of data subnet(s) created                                  |
 | data_subnet_cidrs    | list   | CIDR block of data subnet(s) created                          |
 | nat_public_ip        | string | Elastic IP of NAT gateway                                        |
 | internal_sg          | string | Security group ID for internal communication                     |
