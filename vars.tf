@@ -56,3 +56,7 @@ variable "tags" {
   type    = map(any)
   default = {}
 }
+
+variable "add_eks_tags" {
+  default = false
+}
