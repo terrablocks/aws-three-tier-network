@@ -49,7 +49,7 @@ variable "private_zone_domain" {
 }
 
 variable "create_sgs" {
-  default = true
+  default = false
 }
 
 variable "tags" {

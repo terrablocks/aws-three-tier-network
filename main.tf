@@ -27,7 +27,7 @@ resource "aws_subnet" "pub_sub" {
   tags = merge({
     Name = "${var.network_name}-pub-sub-${element(var.azs, count.index)}"
     Tier = "public"
-  }, var.tags, var.add_eks_tags ? {"kubernetes.io/role/elb": "1"} : {})
+  }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/elb" : "1" } : {})
 }
 
 # Create private subnet
@@ -44,7 +44,7 @@ resource "aws_subnet" "pvt_sub" {
   tags = merge({
     Name = "${var.network_name}-pvt-sub-${element(var.azs, count.index)}"
     Tier = "private"
-  }, var.tags, var.add_eks_tags ? {"kubernetes.io/role/internal-elb": "1"} : {})
+  }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/internal-elb" : "1" } : {})
 }
 
 # Create data subnet
@@ -93,24 +93,24 @@ resource "aws_route_table_association" "pub_rtb_assoc" {
   route_table_id = aws_route_table.pub_rtb.id
 }
 
-# Create EIP for NAT gateway
+# Create EIP for private NAT gateway
 resource "aws_eip" "nat_eip" {
   count = var.create_pvt_nat || var.create_data_nat ? 1 : 0
   vpc   = true
 
   tags = merge({
-    Name = "${var.network_name}-eip"
+    Name = "${var.network_name}-nat-eip"
   }, var.tags)
 }
 
 # Create NAT gateway for private subnet
 resource "aws_nat_gateway" "nat_gw" {
-  count         = var.create_pvt_nat || var.create_data_nat ? 1 : 0
+  count         = var.create_pvt_nat ? 1 : 0
   subnet_id     = aws_subnet.pub_sub[0].id
   allocation_id = join(", ", aws_eip.nat_eip.*.id)
 
   tags = merge({
-    Name = "${var.network_name}-nat-gw"
+    Name = "${var.network_name}-pvt-nat-gw"
   }, var.tags)
 }
 
@@ -134,7 +134,7 @@ resource "aws_route_table" "pvt_nat_rtb" {
   }
 
   tags = merge({
-    Name = "${var.network_name}-pvt-nat-rtb"
+    Name = "${var.network_name}-pvt-rtb"
   }, var.tags)
 }
 
@@ -142,6 +142,27 @@ resource "aws_route_table_association" "pvt_rtb_assoc" {
   count          = length(var.azs)
   subnet_id      = aws_subnet.pvt_sub[count.index].id
   route_table_id = var.create_pvt_nat ? join(", ", aws_route_table.pvt_nat_rtb.*.id) : join(", ", aws_route_table.pvt_rtb.*.id)
+}
+
+# Create EIP for data NAT gateway
+resource "aws_eip" "data_nat_eip" {
+  count = var.create_data_nat ? 1 : 0
+  vpc   = true
+
+  tags = merge({
+    Name = "${var.network_name}-data-nat-eip"
+  }, var.tags)
+}
+
+# Create NAT gateway for data subnet
+resource "aws_nat_gateway" "data_nat_gw" {
+  count         = var.create_data_nat ? 1 : 0
+  subnet_id     = aws_subnet.pub_sub[1].id
+  allocation_id = join(", ", aws_eip.data_nat_eip.*.id)
+
+  tags = merge({
+    Name = "${var.network_name}-data-nat-gw"
+  }, var.tags)
 }
 
 # Create data route table
@@ -160,11 +181,11 @@ resource "aws_route_table" "data_nat_rtb" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = join(", ", aws_nat_gateway.nat_gw.*.id)
+    nat_gateway_id = join(", ", aws_nat_gateway.data_nat_gw.*.id)
   }
 
   tags = merge({
-    Name = "${var.network_name}-data-nat-rtb"
+    Name = "${var.network_name}-data-rtb"
   }, var.tags)
 }
 
