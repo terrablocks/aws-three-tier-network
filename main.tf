@@ -440,23 +440,9 @@ resource "aws_security_group" "pvt_sg" {
   }, var.tags)
 }
 
-# Create VPC flow logs
-resource "aws_flow_log" "flow_logs" {
-  count                = var.create_flow_logs ? 1 : 0
-  iam_role_arn         = var.flow_logs_destination == "cloud-watch-logs" ? aws_iam_role.flow_logs_role[0].arn : ""
-  log_destination      = var.flow_logs_destination == "cloud-watch-logs" ? aws_cloudwatch_log_group.cw_log_group[0].arn : aws_s3_bucket.flow_logs_bucket[0].arn
-  log_destination_type = var.flow_logs_destination
-  traffic_type         = "ALL"
-  vpc_id               = aws_vpc.vpc.id
-
-  tags = merge({
-    Name = "${var.network_name}-flow-logs"
-  }, var.tags)
-}
-
 # Create cloudwatch log group for vpc flow logs
 resource "aws_cloudwatch_log_group" "cw_log_group" {
-  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" ? 1 : 0
+  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? 1 : 0
   name  = "${var.network_name}-flow-logs-group"
 
   tags = merge({
@@ -466,7 +452,7 @@ resource "aws_cloudwatch_log_group" "cw_log_group" {
 
 # Create IAM role for VPC flow logs
 resource "aws_iam_role" "flow_logs_role" {
-  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" ? 1 : 0
+  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? 1 : 0
   name  = "${var.network_name}-flow-logs-role"
 
   assume_role_policy = <<EOF
@@ -492,7 +478,7 @@ EOF
 
 # Create IAM policy for VPC flow logs role
 resource "aws_iam_role_policy" "flow_logs_policy" {
-  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" ? 1 : 0
+  count = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? 1 : 0
   name  = "${var.network_name}-flow-logs-policy"
   role  = aws_iam_role.flow_logs_role[0].id
 
@@ -522,11 +508,30 @@ resource "random_id" "id" {
 
 # Create S3 bucket for flow logs storage
 resource "aws_s3_bucket" "flow_logs_bucket" {
-  count  = var.create_flow_logs && var.flow_logs_destination == "s3" ? 1 : 0
+  count  = var.create_flow_logs && var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? 1 : 0
   bucket = "${var.network_name}-flow-logs-${random_id.id.hex}"
 
   tags = merge({
     Name = "${var.network_name}-flow-logs-${random_id.id.hex}"
+  }, var.tags)
+}
+
+locals {
+  flow_logs_log_group_arn = var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? aws_cloudwatch_log_group.cw_log_group[0].arn : var.flow_logs_cw_log_group_arn
+  flow_logs_bucket_arn    = var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? aws_s3_bucket.flow_logs_bucket[0].arn : var.flow_logs_bucket_arn
+}
+
+# Create VPC flow logs
+resource "aws_flow_log" "flow_logs" {
+  count                = var.create_flow_logs ? 1 : 0
+  iam_role_arn         = var.flow_logs_destination == "cloud-watch-logs" ? aws_iam_role.flow_logs_role[0].arn : ""
+  log_destination      = var.flow_logs_destination == "cloud-watch-logs" ? local.flow_logs_log_group_arn : local.flow_logs_bucket_arn
+  log_destination_type = var.flow_logs_destination
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc.id
+
+  tags = merge({
+    Name = "${var.network_name}-flow-logs"
   }, var.tags)
 }
 

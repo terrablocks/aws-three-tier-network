@@ -40,6 +40,14 @@ variable "flow_logs_destination" {
   default = "cloud-watch-logs"
 }
 
+variable "flow_logs_cw_log_group_arn" {
+  default = ""
+}
+
+variable "flow_logs_bucket_arn" {
+  default = ""
+}
+
 variable "create_private_zone" {
   default = false
 }

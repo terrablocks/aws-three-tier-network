@@ -47,6 +47,8 @@ module "vpc" {
 | create_data_nat            | boolean | Whether to create NAT gateway for data subnet                                     | true                           | N        |
 | create_flow_logs      | boolean | Whether to enable flow logs for VPC                                     | true                           | N        |
 | flow_logs_destination | string  | Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs | cloud-watch-logs             | N        |
+| flow_logs_cw_log_group_arn | string  | ARN of CloudWatch log group to send VPC flow logs to. Leave it blank to create a new log group   |     | N        |
+| flow_logs_bucket_arn | string  | ARN of S3 bucket to store VPC flow logs. Leave it blank to create a new bucket    |     | N        |
 | create_private_zone          | boolean | Whether to create private hosted zone for VPC                             | false                        | N        |
 | private_zone_domain   | string  | Domain name to be used for private hosted zone                            | server.internal.com          | N        |
 | create_sgs   | boolean  | Whether to create default security groups (public, private, internal and ssh)                            | false          | N        |
