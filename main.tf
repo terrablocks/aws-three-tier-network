@@ -28,12 +28,6 @@ resource "aws_subnet" "pub_sub" {
     Name = "${var.network_name}-pub-sub-${element(var.azs, count.index)}"
     Tier = "public"
   }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/elb" : "1" } : {})
-
-  lifecycle {
-    ignore_tags {
-      key_prefixes = ["kubernetes.io/"]
-    }
-  }
 }
 
 # Create private subnet
@@ -51,12 +45,6 @@ resource "aws_subnet" "pvt_sub" {
     Name = "${var.network_name}-pvt-sub-${element(var.azs, count.index)}"
     Tier = "private"
   }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/internal-elb" : "1" } : {})
-
-  lifecycle {
-    ignore_tags {
-      key_prefixes = ["kubernetes.io/"]
-    }
-  }
 }
 
 # Create data subnet
