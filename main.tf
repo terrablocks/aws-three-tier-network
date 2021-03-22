@@ -29,8 +29,10 @@ resource "aws_subnet" "pub_sub" {
     Tier = "public"
   }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/elb" : "1" } : {})
 
-  ignore_tags {
-    key_prefixes = ["kubernetes.io/"]
+  lifecycle {
+    ignore_tags {
+      key_prefixes = ["kubernetes.io/"]
+    }
   }
 }
 
@@ -50,8 +52,10 @@ resource "aws_subnet" "pvt_sub" {
     Tier = "private"
   }, var.tags, var.add_eks_tags ? { "kubernetes.io/role/internal-elb" : "1" } : {})
 
-  ignore_tags {
-    key_prefixes = ["kubernetes.io/"]
+  lifecycle {
+    ignore_tags {
+      key_prefixes = ["kubernetes.io/"]
+    }
   }
 }
 
