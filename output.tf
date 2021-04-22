@@ -27,7 +27,7 @@ output "private_subnet_cidrs" {
 }
 
 output "private_subnet_rtb" {
-  value = var.create_pvt_nat ? aws_route_table.pvt_nat_rtb.id : aws_route_table.pvt_rtb.id
+  value = var.create_pvt_nat ? join(",", aws_route_table.pvt_nat_rtb.*.id) : join(",", aws_route_table.pvt_rtb.*.id)
 }
 
 output "data_subnet_ids" {
@@ -39,7 +39,7 @@ output "data_subnet_cidrs" {
 }
 
 output "data_subnet_rtb" {
-  value = var.create_data_nat ? aws_route_table.data_nat_rtb.id : aws_route_table.data_rtb.id
+  value = var.create_data_nat ? join(",", aws_route_table.data_nat_rtb.*.id) : join(",", aws_route_table.data_rtb.*.id)
 }
 
 output "nat_public_ip" {
