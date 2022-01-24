@@ -300,6 +300,7 @@ resource "aws_default_security_group" "default" {
 # Create private security group
 resource "aws_security_group" "pvt_sg" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
+  # checkov:skip=CKV_AWS_23: Rule description not required
   count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-private-sg"
@@ -327,6 +328,7 @@ resource "aws_security_group" "pvt_sg" {
 # Create protected security group for all communications strictly within the VPC
 resource "aws_security_group" "protected_sg" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
+  # checkov:skip=CKV_AWS_23: Rule description not required
   count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-protected-sg"
@@ -354,6 +356,7 @@ resource "aws_security_group" "protected_sg" {
 # Create security group for public facing web servers or load balancer
 resource "aws_security_group" "pub_sg" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
+  # checkov:skip=CKV_AWS_23: Rule description not required
   count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-pub-web-sg"
@@ -388,6 +391,7 @@ resource "aws_security_group" "pub_sg" {
 # Create security group for internal web/app servers
 resource "aws_security_group" "pvt_web_sg" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
+  # checkov:skip=CKV_AWS_23: Rule description not required
   count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-pvt-web-sg"
