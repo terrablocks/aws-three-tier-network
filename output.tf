@@ -53,9 +53,14 @@ output "data_subnet_rtb" {
   description = "ID of data route table created"
 }
 
-output "nat_public_ip" {
-  value       = var.create_pvt_nat || var.create_data_nat ? join(", ", aws_nat_gateway.nat_gw.*.public_ip) : null
-  description = "Elastic IP of NAT gateway"
+output "pvt_nat_public_ip" {
+  value       = var.create_pvt_nat ? join(", ", aws_nat_gateway.nat_gw.*.public_ip) : null
+  description = "Elastic IP of Private NAT gateway"
+}
+
+output "data_nat_public_ip" {
+  value       = var.create_data_nat ? join(", ", aws_nat_gateway.data_nat_gw.*.public_ip) : null
+  description = "Elastic IP of Data NAT gateway"
 }
 
 output "pvt_sg" {
