@@ -88,7 +88,8 @@ module "network" {
 | data_subnet_ids | List of data subnet id |
 | data_subnet_cidrs | List of data subnet CIDR block |
 | data_subnet_rtb | ID of data route table created |
-| nat_public_ip | Elastic IP of NAT gateway |
+| pvt_nat_public_ip | Elastic IP of Private NAT gateway |
+| data_nat_public_ip | Elastic IP of Data NAT gateway |
 | pvt_sg | ID of private security group |
 | protected_sg | ID of security group allowing all communications strictly within the VPC |
 | public_web_dmz_sg | Security group ID for public facing web servers or load balancer |
