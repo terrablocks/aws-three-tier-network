@@ -209,6 +209,10 @@ resource "aws_route_table_association" "data_rtb_assoc" {
 
 # Create public NACL
 resource "aws_network_acl" "pub_nacl" {
+  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.pub_sub.*.id
 
@@ -237,6 +241,10 @@ resource "aws_network_acl" "pub_nacl" {
 
 # Create private NACL
 resource "aws_network_acl" "pvt_nacl" {
+  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.pvt_sub.*.id
 
@@ -265,6 +273,10 @@ resource "aws_network_acl" "pvt_nacl" {
 
 # Create data NACL
 resource "aws_network_acl" "data_nacl" {
+  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
+  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.data_sub.*.id
 
