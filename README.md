@@ -37,8 +37,8 @@ module "network" {
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.13 |
-| aws | >= 3.37.0 |
+| terraform | >= 0.15 |
+| aws | >= 4.0.0 |
 | random | >= 3.1.0 |
 
 ## Inputs
