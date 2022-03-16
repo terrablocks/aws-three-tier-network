@@ -510,10 +510,13 @@ data "aws_kms_key" "s3" {
 resource "aws_s3_bucket" "flow_logs_bucket" {
   # checkov:skip=CKV_AWS_19: Default SSE is in place
   # checkov:skip=CKV_AWS_18: Access logging not required
+  # checkov:skip=CKV2_AWS_41: Access logging not required
   # checkov:skip=CKV_AWS_144: CRR not required
   # checkov:skip=CKV_AWS_145: Default SSE is in place
+  # checkov:skip=CKV2_AWS_40: Default SSE is in place
   # checkov:skip=CKV_AWS_52: MFA delete not required
   # checkov:skip=CKV_AWS_21: Versioning not required
+  # checkov:skip=CKV2_AWS_37: Versioning not required
   count         = var.create_flow_logs && var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? 1 : 0
   bucket        = "${var.network_name}-flow-logs-${random_id.id.hex}"
   force_destroy = var.s3_force_destroy
