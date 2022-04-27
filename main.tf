@@ -209,30 +209,10 @@ resource "aws_route_table_association" "data_rtb_assoc" {
 
 # Create public NACL
 resource "aws_network_acl" "pub_nacl" {
-  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.pub_sub.*.id
-
-  ingress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  egress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
+  ingress    = var.pub_nacl_ingress
+  egress     = var.pub_nacl_egress
 
   tags = merge({
     Name = "${var.network_name}-pub-nacl"
@@ -241,30 +221,10 @@ resource "aws_network_acl" "pub_nacl" {
 
 # Create private NACL
 resource "aws_network_acl" "pvt_nacl" {
-  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.pvt_sub.*.id
-
-  ingress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  egress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
+  ingress    = var.pvt_nacl_ingress
+  egress     = var.pvt_nacl_egress
 
   tags = merge({
     Name = "${var.network_name}-pvt-nacl"
@@ -273,30 +233,10 @@ resource "aws_network_acl" "pvt_nacl" {
 
 # Create data NACL
 resource "aws_network_acl" "data_nacl" {
-  # checkov:skip=CKV_AWS_229: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_230: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_231: Ingress from everywhere allowed
-  # checkov:skip=CKV_AWS_232: Ingress from everywhere allowed
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = aws_subnet.data_sub.*.id
-
-  ingress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-
-  egress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
+  ingress    = var.data_nacl_ingress
+  egress     = var.data_nacl_egress
 
   tags = merge({
     Name = "${var.network_name}-data-nacl"
@@ -584,8 +524,8 @@ resource "aws_s3_bucket_public_access_block" "flow_logs_bucket" {
 }
 
 locals {
-  flow_logs_log_group_arn = var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? aws_cloudwatch_log_group.cw_log_group[0].arn : var.flow_logs_cw_log_group_arn
-  flow_logs_bucket_arn    = var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? aws_s3_bucket.flow_logs_bucket[0].arn : var.flow_logs_bucket_arn
+  flow_logs_log_group_arn = var.create_flow_logs && var.flow_logs_destination == "cloud-watch-logs" && var.flow_logs_cw_log_group_arn == "" ? aws_cloudwatch_log_group.cw_log_group[0].arn : var.flow_logs_cw_log_group_arn
+  flow_logs_bucket_arn    = var.create_flow_logs && var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? aws_s3_bucket.flow_logs_bucket[0].arn : var.flow_logs_bucket_arn
 }
 
 # Create VPC flow logs
