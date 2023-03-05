@@ -314,6 +314,7 @@ resource "aws_security_group" "protected_sg" {
 resource "aws_security_group" "pub_sg" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
   # checkov:skip=CKV_AWS_23: Rule description not required
+  # checkov:skip=CKV_AWS_260: 80 ingress required
   count       = var.create_sgs ? 1 : 0
   vpc_id      = aws_vpc.vpc.id
   name        = "${var.network_name}-pub-web-sg"
@@ -549,6 +550,8 @@ resource "aws_flow_log" "flow_logs" {
 
 # Create private hosted zone
 resource "aws_route53_zone" "private" {
+  # checkov:skip=CKV2_AWS_39: Query logging
+  # checkov:skip=CKV2_AWS_38: DNSSEC logging
   count = var.create_private_zone == true ? 1 : 0
   name  = var.private_zone_domain
 
