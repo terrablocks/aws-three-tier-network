@@ -39,12 +39,6 @@ variable "assign_ipv6_cidr_block" {
   description = "Requests an Amazon-provided IPv6 CIDR block with a /56 prefix length for the VPC"
 }
 
-variable "map_public_ip_for_public_subnet" {
-  type        = bool
-  default     = true
-  description = "Auto assign public IP to resources launched in public subnet"
-}
-
 variable "azs" {
   type = list(string)
   default = [
@@ -52,6 +46,12 @@ variable "azs" {
     "us-east-1b",
   ]
   description = "List of availability zones to be used for launching resources"
+}
+
+variable "map_public_ip_for_public_subnet" {
+  type        = bool
+  default     = true
+  description = "Auto assign public IP to resources launched in public subnet"
 }
 
 variable "pub_subnet_mask" {
@@ -78,10 +78,22 @@ variable "create_pvt_nat" {
   description = "Whether to create NAT gateway for private subnet"
 }
 
+variable "pvt_nat_eip_id" {
+  type        = string
+  default     = ""
+  description = "Allocation ID of EIP to attach to NAT gateway in private subnet. Leave it blank to create a new EIP"
+}
+
 variable "create_data_nat" {
   type        = bool
   default     = true
-  description = "Whether to create NAT gateway for private subnet"
+  description = "Whether to create NAT gateway for data subnet"
+}
+
+variable "data_nat_eip_id" {
+  type        = string
+  default     = ""
+  description = "Allocation ID of EIP to attach to NAT gateway in data subnet. Leave it blank to create a new EIP"
 }
 
 variable "pub_nacl_ingress" {
