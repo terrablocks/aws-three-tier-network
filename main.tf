@@ -107,11 +107,11 @@ resource "aws_route_table_association" "pub_rtb_assoc" {
 # Create EIP for private NAT gateway
 resource "aws_eip" "nat_eip" {
   # checkov:skip=CKV2_AWS_19: EIP associated to NAT Gateway
-  count = var.create_pvt_nat || var.create_data_nat ? 1 : 0
+  count = var.create_pvt_nat && var.pvt_nat_eip_id == "" ? 1 : 0
   vpc   = true
 
   tags = merge({
-    Name = "${var.network_name}-nat-eip"
+    Name = "${var.network_name}-pvt-nat-eip"
   }, var.tags)
 }
 
@@ -119,7 +119,7 @@ resource "aws_eip" "nat_eip" {
 resource "aws_nat_gateway" "nat_gw" {
   count         = var.create_pvt_nat ? 1 : 0
   subnet_id     = aws_subnet.pub_sub[0].id
-  allocation_id = join(", ", aws_eip.nat_eip.*.id)
+  allocation_id = var.pvt_nat_eip_id == "" ? join(", ", aws_eip.nat_eip.*.id) : var.pvt_nat_eip_id
 
   tags = merge({
     Name = "${var.network_name}-pvt-nat-gw"
@@ -161,7 +161,7 @@ resource "aws_route_table_association" "pvt_rtb_assoc" {
 # Create EIP for data NAT gateway
 resource "aws_eip" "data_nat_eip" {
   # checkov:skip=CKV2_AWS_19: EIP associated to NAT Gateway
-  count = var.create_data_nat ? 1 : 0
+  count = var.create_data_nat && var.data_nat_eip_id == "" ? 1 : 0
   vpc   = true
 
   tags = merge({
@@ -173,7 +173,7 @@ resource "aws_eip" "data_nat_eip" {
 resource "aws_nat_gateway" "data_nat_gw" {
   count         = var.create_data_nat ? 1 : 0
   subnet_id     = aws_subnet.pub_sub[1].id
-  allocation_id = join(", ", aws_eip.data_nat_eip.*.id)
+  allocation_id = var.data_nat_eip_id == "" ? join(", ", aws_eip.data_nat_eip.*.id) : var.data_nat_eip_id
 
   tags = merge({
     Name = "${var.network_name}-data-nat-gw"
