@@ -78,10 +78,16 @@ variable "create_pvt_nat" {
   description = "Whether to create NAT gateway for private subnet"
 }
 
+variable "pvt_nat_ha_mode" {
+  type        = bool
+  default     = true
+  description = "This option will create NAT gateway for private subnet in each availability zone"
+}
+
 variable "pvt_nat_eip_id" {
-  type        = string
-  default     = ""
-  description = "Allocation ID of EIP to attach to NAT gateway in private subnet. Leave it blank to create a new EIP"
+  type        = list(string)
+  default     = []
+  description = "List of allocation ID of EIP to attach to NAT gateway in private subnet. If creating NAT in HA mode count of EIP ID must match AZ count else, count of EIP ID must not exceed 1. Leave it blank to create a new EIP"
 }
 
 variable "create_data_nat" {
@@ -90,10 +96,16 @@ variable "create_data_nat" {
   description = "Whether to create NAT gateway for data subnet"
 }
 
+variable "data_nat_ha_mode" {
+  type        = bool
+  default     = true
+  description = "This option will create NAT gateway for data subnet in each availability zone"
+}
+
 variable "data_nat_eip_id" {
-  type        = string
-  default     = ""
-  description = "Allocation ID of EIP to attach to NAT gateway in data subnet. Leave it blank to create a new EIP"
+  type        = list(string)
+  default     = []
+  description = "List of allocation ID of EIP to attach to NAT gateway in data subnet. If creating NAT in HA mode count of EIP ID must match AZ count else, count of EIP ID must not exceed 1. Leave it blank to create a new EIP"
 }
 
 variable "pub_nacl_ingress" {

@@ -107,7 +107,7 @@ resource "aws_route_table_association" "pub_rtb_assoc" {
 # Create EIP for private NAT gateway
 resource "aws_eip" "nat_eip" {
   # checkov:skip=CKV2_AWS_19: EIP associated to NAT Gateway
-  count = var.create_pvt_nat && var.pvt_nat_eip_id == "" ? 1 : 0
+  count = var.create_pvt_nat && length(var.pvt_nat_eip_id) == 0 ? (var.pvt_nat_ha_mode ? length(var.azs) : 1) : 0
   vpc   = true
 
   tags = merge({
@@ -117,9 +117,9 @@ resource "aws_eip" "nat_eip" {
 
 # Create NAT gateway for private subnet
 resource "aws_nat_gateway" "nat_gw" {
-  count         = var.create_pvt_nat ? 1 : 0
-  subnet_id     = aws_subnet.pub_sub[0].id
-  allocation_id = var.pvt_nat_eip_id == "" ? join(", ", aws_eip.nat_eip.*.id) : var.pvt_nat_eip_id
+  count         = var.create_pvt_nat ? (var.pvt_nat_ha_mode ? length(var.azs) : 1) : 0
+  subnet_id     = aws_subnet.pub_sub[count.index].id
+  allocation_id = length(var.pvt_nat_eip_id) == 0 ? aws_eip.nat_eip[count.index].id : var.pvt_nat_eip_id[count.index]
 
   tags = merge({
     Name = "${var.network_name}-pvt-nat-gw"
@@ -137,7 +137,7 @@ resource "aws_route_table" "pvt_rtb" {
 }
 
 resource "aws_route_table" "pvt_nat_rtb" {
-  count  = var.create_pvt_nat ? 1 : 0
+  count  = var.create_pvt_nat ? (var.pvt_nat_ha_mode ? length(var.azs) : 1) : 0
   vpc_id = aws_vpc.vpc.id
 
   tags = merge({
@@ -146,22 +146,22 @@ resource "aws_route_table" "pvt_nat_rtb" {
 }
 
 resource "aws_route" "pvt_nat_rtb" {
-  count                  = var.create_pvt_nat ? 1 : 0
-  route_table_id         = join(",", aws_route_table.pvt_nat_rtb.*.id)
+  count                  = var.create_pvt_nat ? (var.pvt_nat_ha_mode ? length(var.azs) : 1) : 0
+  route_table_id         = aws_route_table.pvt_nat_rtb[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = join(", ", aws_nat_gateway.nat_gw.*.id)
+  nat_gateway_id         = aws_nat_gateway.nat_gw[count.index].id
 }
 
 resource "aws_route_table_association" "pvt_rtb_assoc" {
   count          = length(var.azs)
   subnet_id      = aws_subnet.pvt_sub[count.index].id
-  route_table_id = var.create_pvt_nat ? join(", ", aws_route_table.pvt_nat_rtb.*.id) : join(", ", aws_route_table.pvt_rtb.*.id)
+  route_table_id = var.create_pvt_nat ? (var.pvt_nat_ha_mode ? aws_route_table.pvt_nat_rtb[count.index].id : join(", ", aws_route_table.pvt_nat_rtb.*.id)) : join(", ", aws_route_table.pvt_rtb.*.id)
 }
 
 # Create EIP for data NAT gateway
 resource "aws_eip" "data_nat_eip" {
   # checkov:skip=CKV2_AWS_19: EIP associated to NAT Gateway
-  count = var.create_data_nat && var.data_nat_eip_id == "" ? 1 : 0
+  count = var.create_data_nat && length(var.data_nat_eip_id) == 0 ? (var.data_nat_ha_mode ? length(var.azs) : 1) : 0
   vpc   = true
 
   tags = merge({
@@ -171,9 +171,9 @@ resource "aws_eip" "data_nat_eip" {
 
 # Create NAT gateway for data subnet
 resource "aws_nat_gateway" "data_nat_gw" {
-  count         = var.create_data_nat ? 1 : 0
-  subnet_id     = aws_subnet.pub_sub[1].id
-  allocation_id = var.data_nat_eip_id == "" ? join(", ", aws_eip.data_nat_eip.*.id) : var.data_nat_eip_id
+  count         = var.create_data_nat ? (var.data_nat_ha_mode ? length(var.azs) : 1) : 0
+  subnet_id     = aws_subnet.pub_sub[count.index].id
+  allocation_id = length(var.data_nat_eip_id) == 0 ? aws_eip.data_nat_eip[count.index].id : var.data_nat_eip_id[count.index]
 
   tags = merge({
     Name = "${var.network_name}-data-nat-gw"
@@ -191,7 +191,7 @@ resource "aws_route_table" "data_rtb" {
 }
 
 resource "aws_route_table" "data_nat_rtb" {
-  count  = var.create_data_nat ? 1 : 0
+  count  = var.create_data_nat ? (var.data_nat_ha_mode ? length(var.azs) : 1) : 0
   vpc_id = aws_vpc.vpc.id
 
   tags = merge({
@@ -200,16 +200,16 @@ resource "aws_route_table" "data_nat_rtb" {
 }
 
 resource "aws_route" "data_nat_rtb" {
-  count                  = var.create_data_nat ? 1 : 0
-  route_table_id         = join(",", aws_route_table.data_nat_rtb.*.id)
+  count                  = var.create_data_nat ? (var.data_nat_ha_mode ? length(var.azs) : 1) : 0
+  route_table_id         = aws_route_table.data_nat_rtb[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = join(", ", aws_nat_gateway.data_nat_gw.*.id)
+  nat_gateway_id         = aws_nat_gateway.data_nat_gw[count.index].id
 }
 
 resource "aws_route_table_association" "data_rtb_assoc" {
   count          = length(var.azs)
   subnet_id      = aws_subnet.data_sub[count.index].id
-  route_table_id = var.create_data_nat ? join(", ", aws_route_table.data_nat_rtb.*.id) : join(", ", aws_route_table.data_rtb.*.id)
+  route_table_id = var.create_data_nat ? (var.data_nat_ha_mode ? aws_route_table.data_nat_rtb[count.index].id : join(", ", aws_route_table.data_nat_rtb.*.id)) : join(", ", aws_route_table.data_rtb.*.id)
 }
 
 # Create public NACL
