@@ -55,12 +55,12 @@ output "data_subnet_rtb" {
 
 output "pvt_nat_public_ip" {
   value       = var.create_pvt_nat ? aws_nat_gateway.nat_gw.*.public_ip : null
-  description = "Elastic IPs of Private NAT gateway"
+  description = "List of Elastic IP associated to Private NAT gateway(s)"
 }
 
 output "data_nat_public_ip" {
   value       = var.create_data_nat ? aws_nat_gateway.data_nat_gw.*.public_ip : null
-  description = "Elastic IPs of Data NAT gateway"
+  description = "List of Elastic IP associated to Data NAT gateway(s)"
 }
 
 output "pvt_sg" {

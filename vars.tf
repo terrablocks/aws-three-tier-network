@@ -218,7 +218,7 @@ variable "data_nacl_egress" {
 
 variable "create_flow_logs" {
   type        = bool
-  default     = false
+  default     = true
   description = "Whether to enable flow logs for VPC"
 }
 
@@ -230,7 +230,7 @@ variable "flow_logs_destination" {
 
 variable "flow_logs_retention" {
   type        = number
-  default     = 0
+  default     = 90
   description = "Time period for which you want to retain VPC flow logs in CloudWatch log group. Default is 0 which means logs never expire. Possible values are 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653"
 }
 

@@ -68,9 +68,9 @@ module "network" {
 | pvt_nacl_egress | List of egress rules to attach to private subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | data_nacl_ingress | List of ingress rules to attach to data subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | data_nacl_egress | List of egress rules to attach to data subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
-| create_flow_logs | Whether to enable flow logs for VPC | `bool` | `false` | no |
+| create_flow_logs | Whether to enable flow logs for VPC | `bool` | `true` | no |
 | flow_logs_destination | Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs | `string` | `"cloud-watch-logs"` | no |
-| flow_logs_retention | Time period for which you want to retain VPC flow logs in CloudWatch log group. Default is 0 which means logs never expire. Possible values are 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 | `number` | `0` | no |
+| flow_logs_retention | Time period for which you want to retain VPC flow logs in CloudWatch log group. Default is 0 which means logs never expire. Possible values are 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 | `number` | `90` | no |
 | flow_logs_cw_log_group_arn | ARN of CloudWatch Log Group to use for storing VPC flow logs | `string` | `""` | no |
 | cw_log_group_kms_key_arn | ARN of KMS key to use for Cloudwatch Log Group SSE | `string` | `null` | no |
 | flow_logs_bucket_arn | ARN of S3 to use for storing VPC flow logs | `string` | `""` | no |
@@ -97,8 +97,8 @@ module "network" {
 | data_subnet_ids | List of data subnet id |
 | data_subnet_cidrs | List of data subnet CIDR block |
 | data_subnet_rtb | ID of data route table created |
-| pvt_nat_public_ip | Elastic IPs of Private NAT gateway |
-| data_nat_public_ip | Elastic IPs of Data NAT gateway |
+| pvt_nat_public_ip | List of Elastic IP associated to Private NAT gateway(s) |
+| data_nat_public_ip | List of Elastic IP associated to Data NAT gateway(s) |
 | pvt_sg | ID of private security group |
 | protected_sg | ID of security group allowing all communications strictly within the VPC |
 | public_web_dmz_sg | Security group ID for public facing web servers or load balancer |
