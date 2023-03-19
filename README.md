@@ -55,11 +55,13 @@ module "network" {
 | map_public_ip_for_public_subnet | Auto assign public IP to resources launched in public subnet | `bool` | `true` | no |
 | pub_subnet_mask | Subnet mask to use for public subnet | `number` | `24` | no |
 | pvt_subnet_mask | Subnet mask to use for private subnet | `number` | `24` | no |
-| data_subnet_mask | Subnet mask to use for data subnet | `number` | `"24"` | no |
+| data_subnet_mask | Subnet mask to use for data subnet | `number` | `24` | no |
 | create_pvt_nat | Whether to create NAT gateway for private subnet | `bool` | `true` | no |
-| pvt_nat_eip_id | Allocation ID of EIP to attach to NAT gateway in private subnet. Leave it blank to create a new EIP | `string` | `""` | no |
+| pvt_nat_ha_mode | This option will create NAT gateway for private subnet in each availability zone | `bool` | `true` | no |
+| pvt_nat_eip_id | List of allocation ID of EIP to attach to NAT gateway in private subnet. If creating NAT in HA mode count of EIP ID must match AZ count otherwise, count of EIP ID should be 1. Leave it blank to create new EIP(s) | `list(string)` | `[]` | no |
 | create_data_nat | Whether to create NAT gateway for data subnet | `bool` | `true` | no |
-| data_nat_eip_id | Allocation ID of EIP to attach to NAT gateway in data subnet. Leave it blank to create a new EIP | `string` | `""` | no |
+| data_nat_ha_mode | This option will create NAT gateway for data subnet in each availability zone | `bool` | `true` | no |
+| data_nat_eip_id | List of allocation ID of EIP to attach to NAT gateway in data subnet. If creating NAT in HA mode count of EIP ID must match AZ count otherwise, count of EIP ID should be 1. Leave it blank to create new EIP(s) | `list(string)` | `[]` | no |
 | pub_nacl_ingress | List of ingress rules to attach to public subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | pub_nacl_egress | List of egress rules to attach to public subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | pvt_nacl_ingress | List of ingress rules to attach to private subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
@@ -95,8 +97,8 @@ module "network" {
 | data_subnet_ids | List of data subnet id |
 | data_subnet_cidrs | List of data subnet CIDR block |
 | data_subnet_rtb | ID of data route table created |
-| pvt_nat_public_ip | Elastic IP of Private NAT gateway |
-| data_nat_public_ip | Elastic IP of Data NAT gateway |
+| pvt_nat_public_ip | Elastic IPs of Private NAT gateway |
+| data_nat_public_ip | Elastic IPs of Data NAT gateway |
 | pvt_sg | ID of private security group |
 | protected_sg | ID of security group allowing all communications strictly within the VPC |
 | public_web_dmz_sg | Security group ID for public facing web servers or load balancer |

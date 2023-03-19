@@ -87,7 +87,7 @@ variable "pvt_nat_ha_mode" {
 variable "pvt_nat_eip_id" {
   type        = list(string)
   default     = []
-  description = "List of allocation ID of EIP to attach to NAT gateway in private subnet. If creating NAT in HA mode count of EIP ID must match AZ count else, count of EIP ID must not exceed 1. Leave it blank to create a new EIP"
+  description = "List of allocation ID of EIP to attach to NAT gateway in private subnet. If creating NAT in HA mode count of EIP ID must match AZ count otherwise, count of EIP ID should be 1. Leave it blank to create new EIP(s)"
 }
 
 variable "create_data_nat" {
@@ -105,7 +105,7 @@ variable "data_nat_ha_mode" {
 variable "data_nat_eip_id" {
   type        = list(string)
   default     = []
-  description = "List of allocation ID of EIP to attach to NAT gateway in data subnet. If creating NAT in HA mode count of EIP ID must match AZ count else, count of EIP ID must not exceed 1. Leave it blank to create a new EIP"
+  description = "List of allocation ID of EIP to attach to NAT gateway in data subnet. If creating NAT in HA mode count of EIP ID must match AZ count otherwise, count of EIP ID should be 1. Leave it blank to create new EIP(s)"
 }
 
 variable "pub_nacl_ingress" {
@@ -218,7 +218,7 @@ variable "data_nacl_egress" {
 
 variable "create_flow_logs" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether to enable flow logs for VPC"
 }
 
