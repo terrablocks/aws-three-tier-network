@@ -218,7 +218,7 @@ variable "data_nacl_egress" {
 
 variable "create_flow_logs" {
   type        = bool
-  default     = false
+  default     = true
   description = "Whether to enable flow logs for VPC"
 }
 
