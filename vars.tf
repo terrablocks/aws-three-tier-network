@@ -68,7 +68,7 @@ variable "pvt_subnet_mask" {
 
 variable "data_subnet_mask" {
   type        = number
-  default     = "24"
+  default     = 24
   description = "Subnet mask to use for data subnet"
 }
 
