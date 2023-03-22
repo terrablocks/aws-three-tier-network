@@ -70,15 +70,19 @@ module "network" {
 | data_nacl_egress | List of egress rules to attach to data subnet NACL | `list(any)` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "icmp_code": null,<br>    "icmp_type": null,<br>    "ipv6_cidr_block": null,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | create_flow_logs | Whether to enable flow logs for VPC | `bool` | `true` | no |
 | flow_logs_destination | Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs | `string` | `"cloud-watch-logs"` | no |
+| flow_logs_log_format | Specify the fields to include in the flow log record. Leave it to `null` to use the AWS default format. Refer to [AWS doc](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-logs-fields) to learn what all fields can be included in the flow logs | `string` | `null` | no |
 | flow_logs_retention | Time period for which you want to retain VPC flow logs in CloudWatch log group. Default is 0 which means logs never expire. Possible values are 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653 | `number` | `90` | no |
 | flow_logs_cw_log_group_arn | ARN of CloudWatch Log Group to use for storing VPC flow logs | `string` | `""` | no |
 | cw_log_group_kms_key_arn | ARN of KMS key to use for Cloudwatch Log Group SSE | `string` | `null` | no |
 | flow_logs_bucket_arn | ARN of S3 to use for storing VPC flow logs | `string` | `""` | no |
+| flow_logs_s3_file_format | The format of log file delivered to the S3 bucket. **Valid values:** plain-text, parquet | `string` | `"plain-text"` | no |
+| flow_logs_s3_hive_compatible_partitions | Whether to use Hive-compatible S3 prefixes to simplify the loading of new data into your Hive-compatible tools | `bool` | `false` | no |
+| flow_logs_s3_per_hour_partition | Partition your logs per hour to reduce your query costs and get faster response if you have a large volume of logs and typically run queries targeted to a specific hour timeframe. Setting it to `false` will partition logs every 24 hours | `bool` | `true` | no |
 | s3_force_destroy | Delete bucket content before deleting bucket | `bool` | `true` | no |
 | s3_kms_key | Alias/ID/ARN of KMS key to use for encrypting S3 bucket content | `string` | `"alias/aws/s3"` | no |
 | create_private_zone | Whether to create private hosted zone for VPC | `bool` | `false` | no |
 | private_zone_domain | Domain name to be used for private hosted zone | `string` | `"server.internal.com"` | no |
-| create_sgs | Whether to create few additional security groups which are mostly required for controlling traffic | `bool` | `true` | no |
+| create_sgs | Whether to create few widely used security groups for controlling traffic | `bool` | `false` | no |
 | tags | Map of key-value pair to associate with resources | `map(any)` | `{}` | no |
 | add_eks_tags | Add `kubernetes.io/role/elb: 1` and `kubernetes.io/role/internal-elb: 1` tags to public and private subnets respectively for load balancer | `bool` | `false` | no |
 

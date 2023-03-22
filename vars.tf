@@ -228,6 +228,12 @@ variable "flow_logs_destination" {
   description = "Destination to store VPC flow logs. Possible values: s3, cloud-watch-logs"
 }
 
+variable "flow_logs_log_format" {
+  type        = string
+  default     = null
+  description = "Specify the fields to include in the flow log record. Leave it to `null` to use the AWS default format. Refer to [AWS doc](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-logs-fields) to learn what all fields can be included in the flow logs"
+}
+
 variable "flow_logs_retention" {
   type        = number
   default     = 90
@@ -250,6 +256,24 @@ variable "flow_logs_bucket_arn" {
   type        = string
   default     = ""
   description = "ARN of S3 to use for storing VPC flow logs"
+}
+
+variable "flow_logs_s3_file_format" {
+  type        = string
+  default     = "plain-text"
+  description = "The format of log file delivered to the S3 bucket. **Valid values:** plain-text, parquet"
+}
+
+variable "flow_logs_s3_hive_compatible_partitions" {
+  type        = bool
+  default     = false
+  description = "Whether to use Hive-compatible S3 prefixes to simplify the loading of new data into your Hive-compatible tools"
+}
+
+variable "flow_logs_s3_per_hour_partition" {
+  type        = bool
+  default     = true
+  description = "Partition your logs per hour to reduce your query costs and get faster response if you have a large volume of logs and typically run queries targeted to a specific hour timeframe. Setting it to `false` will partition logs every 24 hours"
 }
 
 variable "s3_force_destroy" {
@@ -278,8 +302,8 @@ variable "private_zone_domain" {
 
 variable "create_sgs" {
   type        = bool
-  default     = true
-  description = "Whether to create few additional security groups which are mostly required for controlling traffic"
+  default     = false
+  description = "Whether to create few widely used security groups for controlling traffic"
 }
 
 variable "tags" {
