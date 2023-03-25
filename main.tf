@@ -1,3 +1,7 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
+
 # Create VPC
 resource "aws_vpc" "vpc" {
   # checkov:skip=CKV2_AWS_12: All traffic restricted from within the security group
@@ -15,6 +19,7 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_default_network_acl" "this" {
   default_network_acl_id = aws_vpc.vpc.default_network_acl_id
+  tags                   = var.tags
 }
 
 locals {
@@ -252,6 +257,7 @@ resource "aws_network_acl" "data_nacl" {
 resource "aws_default_security_group" "default" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
   vpc_id = aws_vpc.vpc.id
+  tags   = var.tags
 }
 
 # Create private security group
@@ -268,6 +274,7 @@ resource "aws_security_group" "pvt_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [var.cidr_block]
+    description = "Allow all incoming connections within internal network"
   }
 
   egress {
@@ -275,6 +282,7 @@ resource "aws_security_group" "pvt_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outgoing connections within internal network"
   }
 
   tags = merge({
@@ -296,6 +304,7 @@ resource "aws_security_group" "protected_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [var.cidr_block]
+    description = "Allow all incoming connections within internal network"
   }
 
   egress {
@@ -303,6 +312,7 @@ resource "aws_security_group" "protected_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = [var.cidr_block]
+    description = "Allow all outgoing connections within internal network"
   }
 
   tags = merge({
@@ -325,6 +335,7 @@ resource "aws_security_group" "pub_sg" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming http connections"
   }
 
   ingress {
@@ -332,6 +343,7 @@ resource "aws_security_group" "pub_sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow incoming https connections"
   }
 
   egress {
@@ -339,6 +351,7 @@ resource "aws_security_group" "pub_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outgoing connections"
   }
 
   tags = merge({
@@ -360,6 +373,7 @@ resource "aws_security_group" "pvt_web_sg" {
     to_port         = 80
     protocol        = "tcp"
     security_groups = aws_security_group.pub_sg.*.id
+    description     = "Allow incoming http connections from public sg"
   }
 
   ingress {
@@ -367,6 +381,7 @@ resource "aws_security_group" "pvt_web_sg" {
     to_port         = 443
     protocol        = "tcp"
     security_groups = aws_security_group.pub_sg.*.id
+    description     = "Allow incoming https connections from public sg"
   }
 
   egress {
@@ -374,6 +389,7 @@ resource "aws_security_group" "pvt_web_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outgoing connections"
   }
 
   tags = merge({
@@ -474,10 +490,13 @@ resource "aws_s3_bucket" "flow_logs_bucket" {
   }, var.tags)
 }
 
-resource "aws_s3_bucket_acl" "flow_logs_bucket" {
+resource "aws_s3_bucket_ownership_controls" "flow_logs_bucket" {
   count  = var.create_flow_logs && var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? 1 : 0
   bucket = join(",", aws_s3_bucket.flow_logs_bucket.*.id)
-  acl    = "private"
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "flow_logs_bucket" {
@@ -490,6 +509,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "flow_logs_bucket"
       kms_master_key_id = var.s3_kms_key == "alias/aws/s3" ? null : data.aws_kms_key.s3.id
     }
   }
+}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+  region     = data.aws_region.current.name
 }
 
 data "aws_iam_policy_document" "flow_logs_bucket" {
@@ -505,13 +529,68 @@ data "aws_iam_policy_document" "flow_logs_bucket" {
       identifiers = ["*"]
     }
     resources = [
-      join(",", aws_s3_bucket.flow_logs_bucket.*.id),
-      "${join(",", aws_s3_bucket.flow_logs_bucket.*.id)}/*"
+      join(",", aws_s3_bucket.flow_logs_bucket.*.arn),
+      "${join(",", aws_s3_bucket.flow_logs_bucket.*.arn)}/*"
     ]
     condition {
       test     = "Bool"
       variable = "aws:SecureTransport"
       values   = ["false"]
+    }
+  }
+
+  statement {
+    sid    = "AWSLogDeliveryWrite"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+    resources = [
+      "${join(",", aws_s3_bucket.flow_logs_bucket.*.arn)}/*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [local.account_id]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:logs:${local.region}:${local.account_id}:*"]
+    }
+  }
+
+  statement {
+    sid    = "AWSLogDeliveryAclCheck"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+    resources = [
+      join(",", aws_s3_bucket.flow_logs_bucket.*.arn)
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [local.account_id]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:logs:${local.region}:${local.account_id}:*"]
     }
   }
 }
@@ -539,11 +618,21 @@ locals {
 # Create VPC flow logs
 resource "aws_flow_log" "flow_logs" {
   count                = var.create_flow_logs ? 1 : 0
-  iam_role_arn         = var.flow_logs_destination == "cloud-watch-logs" ? aws_iam_role.flow_logs_role[0].arn : ""
+  iam_role_arn         = var.flow_logs_destination == "cloud-watch-logs" ? aws_iam_role.flow_logs_role[0].arn : null
   log_destination      = var.flow_logs_destination == "cloud-watch-logs" ? local.flow_logs_log_group_arn : local.flow_logs_bucket_arn
   log_destination_type = var.flow_logs_destination
+  log_format           = var.flow_logs_log_format
   traffic_type         = "ALL"
   vpc_id               = aws_vpc.vpc.id
+
+  dynamic "destination_options" {
+    for_each = var.create_flow_logs && var.flow_logs_destination == "s3" ? [0] : []
+    content {
+      file_format                = var.flow_logs_s3_file_format
+      hive_compatible_partitions = var.flow_logs_s3_hive_compatible_partitions
+      per_hour_partition         = var.flow_logs_s3_per_hour_partition
+    }
+  }
 
   tags = merge({
     Name = "${var.network_name}-flow-logs"
