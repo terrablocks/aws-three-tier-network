@@ -231,7 +231,7 @@ variable "flow_logs_destination" {
 variable "flow_logs_log_format" {
   type        = string
   default     = null
-  description = "Specify the fields to include in the flow log record. Leave it to `null` to use the AWS default format. Refer to [AWS doc](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-logs-fields) to learn what all fields can be included in the flow logs"
+  description = "Specify the fields using the $${field-id} format, separated by spaces to include in the flow log record. E.g: $${version} $${account-id}. Leave it to `null` to use the AWS default format. Refer to [AWS doc](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html#flow-logs-fields) to learn what all fields can be included in the flow logs"
 }
 
 variable "flow_logs_retention" {
