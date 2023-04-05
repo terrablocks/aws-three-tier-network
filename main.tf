@@ -465,6 +465,8 @@ resource "aws_s3_bucket" "flow_logs_bucket" {
   # checkov:skip=CKV_AWS_52: MFA delete not required
   # checkov:skip=CKV_AWS_21: Versioning not required
   # checkov:skip=CKV2_AWS_37: Versioning not required
+  # checkov:skip=CKV2_AWS_61: Lifecycle configuration creation depends on user
+  # checkov:skip=CKV2_AWS_62: Event notifications not required
   count         = var.create_flow_logs && var.flow_logs_destination == "s3" && var.flow_logs_bucket_arn == "" ? 1 : 0
   bucket        = "${var.network_name}-flow-logs-${random_id.id.hex}"
   force_destroy = var.s3_force_destroy
