@@ -15,6 +15,7 @@ resource "aws_vpc" "vpc" {
 
 resource "aws_default_network_acl" "this" {
   default_network_acl_id = aws_vpc.vpc.default_network_acl_id
+  tags                   = var.tags
 }
 
 locals {
@@ -252,6 +253,7 @@ resource "aws_network_acl" "data_nacl" {
 resource "aws_default_security_group" "default" {
   # checkov:skip=CKV2_AWS_5: Attaching this security group to a resource depends on user
   vpc_id = aws_vpc.vpc.id
+  tags   = var.tags
 }
 
 # Create private security group
